@@ -88,7 +88,14 @@ out:
 void *_pa_malloc()
 {
     void *p = (void*)pa_root;
+    if (!p) {
+        errno = ENOMEM;
+        goto out;
+    }
+
     pa_root = (pa_ptr*)(pa_root->next);
+
+out:
     return p;
 }
 
@@ -98,12 +105,6 @@ void *pa_malloc()
 
     if (!pa_heap) {
         DBGLOG_DEBUG("pa: Call pa_init() before\n");
-        errno = ENOMEM;
-        goto out;
-    }
-
-    if (!pa_root) {
-        DBGLOG_DEBUG("pa: Not enough space/cannot allocate memory\n");
         errno = ENOMEM;
         goto out;
     }
